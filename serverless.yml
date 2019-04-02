@@ -11,8 +11,8 @@ provider:
   region: eu-west-1
 
 functions:
-  hello:
-    handler: handler.hello
+  singleScraper:
+    handler: singleScraper.scrape
     events:
       - http:
           method: get
