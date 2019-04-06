@@ -1,5 +1,5 @@
 service:
-  name: aws-nodejs-typescript
+  name: thedecidermachine
 
 plugins:
   - serverless-webpack
@@ -9,6 +9,19 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-west-1
+  timeout: 20
+  environment:
+    CUSTOM_CHROME: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:GetQueueUrl
+        - sqs:GetQueueAttributes
+        - sqs:DeleteMessage
+        - sqs:ChangeMessageVisibility
+      Resource: "arn:aws:sqs:eu-west-1:*:${self:service.name}-queue"
 
 functions:
   singleScraper:
@@ -17,3 +30,14 @@ functions:
       - http:
           method: get
           path: hello
+  scraperestaurants:
+    handler: src/scraper/handler.scrape
+    # events:
+    #   - schedule: cron(0 10 * * * *)
+
+resources:
+  Resources:
+    urlqueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service.name}-queue
