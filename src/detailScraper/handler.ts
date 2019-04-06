@@ -7,13 +7,21 @@ const baseUrl: string = "https://www.lounaat.info";
 export const scrape: SQSHandler = async (event: SQSEvent, _context, cb) => {
   const restaurant = {
     address: null,
+    kitchen_type: null,
     menus: [],
-    name: null
+    name: null,
+    restaurant_type: null,
   };
   console.info(`Detail scaper called with event: ${JSON.stringify(event)}`);
   const { data } = await axios.get(`${baseUrl}${event.Records[0].body}`);
   const $ = cheerio.load(data);
 
+  restaurant.kitchen_type = $(".kitchen-type")
+    .text()
+    .trim()
+  restaurant.restaurant_type = $(".restaurant-type")
+    .text()
+    .trim()
   restaurant.name = $(".tile-full > h2")
     .text()
     .match(/([A-Z])\w*/g)
