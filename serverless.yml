@@ -1,5 +1,5 @@
 service:
-  name: aws-nodejs-typescript
+  name: thedecidermachine
 
 plugins:
   - serverless-webpack
@@ -9,6 +9,18 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-west-1
+  environment:
+    SQS_URL: !Ref RestaurantUrlQueue
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:GetQueueUrl
+        - sqs:GetQueueAttributes
+        - sqs:DeleteMessage
+        - sqs:ChangeMessageVisibility
+      Resource: !GetAtt RestaurantUrlQueue.Arn
 
 functions:
   singleScraper:
@@ -17,3 +29,13 @@ functions:
       - http:
           method: get
           path: hello
+  scrapeRestaurantUrls:
+    handler: src/scraper/handler.scrape
+    timeout: 60
+
+resources:
+  Resources:
+    RestaurantUrlQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service.name}-queue
