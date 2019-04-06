@@ -1,7 +1,7 @@
 import { ScheduledHandler } from "aws-lambda";
+import * as AWS from "aws-sdk";
 import axios from "axios";
 import cheerio from "cheerio";
-import * as AWS from "aws-sdk";
 
 const { SQS_URL, REGION } = process.env;
 
@@ -34,8 +34,8 @@ export const scrape: ScheduledHandler = async () => {
   for (const url of restaurantUrls) {
     await sqsClient
       .sendMessage({
-        QueueUrl: SQS_URL,
-        MessageBody: url
+        MessageBody: url,
+        QueueUrl: SQS_URL
       })
       .promise();
   }

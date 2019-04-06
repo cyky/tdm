@@ -4,15 +4,15 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "debug singleScraper",
+            "name": "debug detail scraper",
             "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
             "args": [
                 "invoke",
                 "local",
                 "-f",
-                "singleScraper",
+                "scrapeRestaurantDetails",
                 "--data",
-                "url"
+                "/lounas/la-torrefazione-lasipalatsi/helsinki"
             ],
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"

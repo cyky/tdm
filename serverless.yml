@@ -24,8 +24,8 @@ provider:
       Resource: !GetAtt RestaurantUrlQueue.Arn
 
 functions:
-  singleScraper:
-    handler: singleScraper.scrape
+  scrapeRestaurantDetails:
+    handler: src/detailScraper/handler.scrape
     events:
       - http:
           method: get
