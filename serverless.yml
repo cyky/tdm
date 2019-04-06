@@ -43,8 +43,6 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:service.name}-queue
-<<<<<<< Updated upstream
-=======
     RestaurantsEsDomain:
       Type: AWS::Elasticsearch::Domain
       Properties:
@@ -59,4 +57,3 @@ resources:
           InstanceType: 't2.small.elasticsearch'
           ZoneAwarenessEnabled: false
         ElasticsearchVersion: '6.3'
->>>>>>> Stashed changes
