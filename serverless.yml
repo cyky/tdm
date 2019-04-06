@@ -11,6 +11,7 @@ provider:
   region: eu-west-1
   environment:
     SQS_URL: !Ref RestaurantUrlQueue
+    REGION: ${self:provider.region}
   iamRoleStatements:
     - Effect: Allow
       Action:

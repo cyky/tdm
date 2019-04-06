@@ -2,12 +2,12 @@ import { ScheduledHandler } from "aws-lambda";
 import axios from "axios";
 import cheerio from "cheerio";
 import * as AWS from "aws-sdk";
-import { SQS } from "aws-sdk";
+
+const { SQS_URL, REGION } = process.env;
 
 export const scrape: ScheduledHandler = async () => {
-  AWS.config.update({ region: "eu-west-1" });
-  const sqsClient = new SQS({ apiVersion: "2012-11-05" });
-  const { SQS_URL } = process.env;
+  AWS.config.update({ region: REGION });
+  const sqsClient = new AWS.SQS({ apiVersion: "2012-11-05" });
 
   const restaurantUrls: string[] = [];
 
