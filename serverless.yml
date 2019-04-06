@@ -22,6 +22,10 @@ provider:
         - sqs:DeleteMessage
         - sqs:ChangeMessageVisibility
       Resource: !GetAtt RestaurantUrlQueue.Arn
+    - Effect: Allow
+      Action:
+        - 'es:ESHttp*'
+      Resource: !GetAtt RestaurantsEsDomain.DomainArn
 
 functions:
   scrapeRestaurantDetails:
@@ -39,3 +43,20 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:service.name}-queue
+<<<<<<< Updated upstream
+=======
+    RestaurantsEsDomain:
+      Type: AWS::Elasticsearch::Domain
+      Properties:
+        DomainName: ${self:service.name}-es
+        EBSOptions:
+          EBSEnabled: true
+          VolumeSize: 20
+          VolumeType: gp2
+        ElasticsearchClusterConfig:
+          DedicatedMasterEnabled: false
+          InstanceCount: 1
+          InstanceType: 't2.small.elasticsearch'
+          ZoneAwarenessEnabled: false
+        ElasticsearchVersion: '6.3'
+>>>>>>> Stashed changes
