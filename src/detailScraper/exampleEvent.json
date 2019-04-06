@@ -1,0 +1,9 @@
+{
+    "Records": [
+        {
+            "messageId": "id",
+            "receiptHandle": "handle",
+            "body": "/lounas/unicafe-well-kaisa-talo/helsinki"
+        }
+    ]
+}

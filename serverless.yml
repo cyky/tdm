@@ -27,9 +27,8 @@ functions:
   scrapeRestaurantDetails:
     handler: src/detailScraper/handler.scrape
     events:
-      - http:
-          method: get
-          path: hello
+      - sqs:
+          arn: !GetAtt RestaurantUrlQueue.Arn
   scrapeRestaurantUrls:
     handler: src/scraper/handler.scrape
     timeout: 60

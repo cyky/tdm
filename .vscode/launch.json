@@ -11,8 +11,8 @@
                 "local",
                 "-f",
                 "scrapeRestaurantDetails",
-                "--data",
-                "/lounas/la-torrefazione-lasipalatsi/helsinki"
+                "--path",
+                "src/detailScraper/exampleEvent.json"
             ],
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"

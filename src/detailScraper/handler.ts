@@ -1,17 +1,17 @@
-import { APIGatewayProxyHandler } from "aws-lambda";
+import { SQSEvent, SQSHandler } from "aws-lambda";
 import axios from "axios";
 import cheerio from "cheerio";
 
 const baseUrl: string = "https://www.lounaat.info";
 
-export const scrape: APIGatewayProxyHandler = async event => {
+export const scrape: SQSHandler = async (event: SQSEvent, _context, cb) => {
   const restaurant = {
     address: null,
     menus: [],
     name: null
   };
-
-  const { data } = await axios.get(`${baseUrl}${event}`);
+  console.info(`Detail scaper called with event: ${JSON.stringify(event)}`);
+  const { data } = await axios.get(`${baseUrl}${event.Records[0].body}`);
   const $ = cheerio.load(data);
 
   restaurant.name = $(".tile-full > h2")
@@ -55,8 +55,6 @@ export const scrape: APIGatewayProxyHandler = async event => {
       restaurant.menus.push(day, items);
     });
 
-  return {
-    body: JSON.stringify(restaurant),
-    statusCode: 200
-  };
+  console.info(`Restaurant: ${JSON.stringify(restaurant)}`);
+  cb(null);
 };
