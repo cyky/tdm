@@ -12,6 +12,8 @@ provider:
   environment:
     SQS_URL: !Ref RestaurantUrlQueue
     REGION: ${self:provider.region}
+    DYNAMODB_RESTAURANT_TABLE: ${self:service.name}-db
+    DYNAMODB_ADDRESS_TABLE: ${self:service.name}-address-db
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -24,18 +26,33 @@ provider:
       Resource: !GetAtt RestaurantUrlQueue.Arn
     - Effect: Allow
       Action:
-        - 'es:ESHttp*'
-      Resource: !GetAtt RestaurantsEsDomain.DomainArn
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+      Resource:
+      - !GetAtt RestaurantMenuDatabase.Arn
+      - !GetAtt RestaurantAddressDatabase.Arn
 
 functions:
   scrapeRestaurantDetails:
     handler: src/detailScraper/handler.scrape
+    timeout: 30
     events:
       - sqs:
           arn: !GetAtt RestaurantUrlQueue.Arn
+          batchSize: 10
   scrapeRestaurantUrls:
     handler: src/scraper/handler.scrape
     timeout: 60
+    events:
+      - schedule:
+        rate: cron(0 7 * * * *)
+        enabled: true
+
 
 resources:
   Resources:
@@ -43,17 +60,29 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:service.name}-queue
-    RestaurantsEsDomain:
-      Type: AWS::Elasticsearch::Domain
+    RestaurantMenuDatabase:
+      Type: AWS::DynamoDB::Table
       Properties:
-        DomainName: ${self:service.name}-es
-        EBSOptions:
-          EBSEnabled: true
-          VolumeSize: 20
-          VolumeType: gp2
-        ElasticsearchClusterConfig:
-          DedicatedMasterEnabled: false
-          InstanceCount: 1
-          InstanceType: 't2.small.elasticsearch'
-          ZoneAwarenessEnabled: false
-        ElasticsearchVersion: '6.3'
+        AttributeDefinitions:
+          - AttributeName: restaurantName
+            AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: restaurantName
+            KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
+        TableName: ${self:service.name}-db
+    RestaurantAddressDatabase:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: address
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: address
+            KeyType: HASH
+        TableName: ${self:service.name}-address-db
